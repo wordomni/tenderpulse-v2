@@ -1,3 +1,20 @@
+const tenders = [
+  {
+    title: "Cloud Infrastructure Upgrade",
+    description: "Government technology services opportunity.",
+    score: 92
+  },
+  {
+    title: "Data Analytics Platform",
+    description: "Public sector analytics opportunity.",
+    score: 87
+  },
+  {
+    title: "Cyber Security Services",
+    description: "Security improvement contract.",
+    score: 95
+  }
+];
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 <div style="
   font-family: Arial, sans-serif;
