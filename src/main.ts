@@ -22,7 +22,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <button style="
       padding:12px 20px;
       font-size:16px;
-      cursor:pointer;
     ">
       Search Tenders
     </button>
