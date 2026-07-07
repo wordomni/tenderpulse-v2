@@ -11,10 +11,11 @@ const tenders = [
   },
   {
     title: "Cyber Security Services",
-    description: "Security improvement contract.",
+    description: "Security improvement contract opportunity.",
     score: 95
   }
 ];
+
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 <div style="
   font-family: Arial, sans-serif;
@@ -39,6 +40,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         <h1 style="margin:0;">
           TenderPulse
         </h1>
+
         <p style="color:#666;">
           AI-powered tender intelligence platform
         </p>
@@ -50,6 +52,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         border:none;
         padding:12px 20px;
         border-radius:8px;
+        cursor:pointer;
       ">
         Premium
       </button>
@@ -88,6 +91,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         padding:14px 25px;
         border-radius:8px;
         font-size:16px;
+        cursor:pointer;
       ">
         Search Tenders
       </button>
@@ -95,7 +99,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     </section>
 
 
-    <h2 style="margin-top:40px;">
+    <h2 style="
+      margin-top:40px;
+    ">
       Latest Opportunities
     </h2>
 
@@ -106,52 +112,32 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       gap:20px;
     ">
 
+      ${tenders.map(tender => `
+        <div style="
+          background:white;
+          padding:20px;
+          border-radius:12px;
+          box-shadow:0 3px 10px rgba(0,0,0,0.05);
+        ">
 
-      <div style="
-        background:white;
-        padding:20px;
-        border-radius:12px;
-      ">
+          <h3>
+            ${tender.title}
+          </h3>
 
-        <h3>
-          Cloud Infrastructure Upgrade
-        </h3>
+          <p>
+            ${tender.description}
+          </p>
 
-        <p>
-          Government technology services opportunity.
-        </p>
+          <strong>
+            AI Match Score: ${tender.score}%
+          </strong>
 
-        <strong>
-          AI Match Score: 92%
-        </strong>
-
-      </div>
-
-
-      <div style="
-        background:white;
-        padding:20px;
-        border-radius:12px;
-      ">
-
-        <h3>
-          Data Analytics Platform
-        </h3>
-
-        <p>
-          Public sector analytics opportunity.
-        </p>
-
-        <strong>
-          AI Match Score: 87%
-        </strong>
-
-      </div>
-
+        </div>
+      `).join("")}
 
     </div>
 
   </div>
 
 </div>
-`
+`;
