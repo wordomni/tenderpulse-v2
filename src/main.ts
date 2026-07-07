@@ -1,38 +1,23 @@
-const tenders = [
-  {
-    title: "Cloud Infrastructure Upgrade",
-    organisation: "Department of Technology",
-    country: "Australia",
-    category: "IT Services",
-    deadline: "30 September 2026",
-    score: 92,
-    description:
-      "Government cloud infrastructure modernisation opportunity."
-  },
-  {
-    title: "Data Analytics Platform",
-    organisation: "Public Health Agency",
-    country: "Australia",
-    category: "Data Analytics",
-    deadline: "15 October 2026",
-    score: 87,
-    description:
-      "Analytics platform implementation and support services."
-  },
-  {
-    title: "Cyber Security Services",
-    organisation: "Government Security Office",
-    country: "Australia",
-    category: "Cyber Security",
-    deadline: "5 November 2026",
-    score: 95,
-    description:
-      "Cyber security monitoring and protection services."
-  }
-];
+import { supabase } from './supabase'
 
 
-const app = document.querySelector<HTMLDivElement>("#app");
+type Tender = {
+  id?: number
+  title: string
+  organisation: string
+  country: string
+  category: string
+  deadline: string
+  score: number
+  description: string
+  source_url?: string
+}
+
+
+let tenders: Tender[] = []
+
+
+const app = document.querySelector<HTMLDivElement>("#app")
 
 
 if (app) {
@@ -76,7 +61,6 @@ if (app) {
           border:none;
           padding:12px 20px;
           border-radius:8px;
-          cursor:pointer;
         ">
           Premium
         </button>
@@ -123,7 +107,6 @@ if (app) {
             padding:14px 25px;
             border-radius:8px;
             font-size:16px;
-            cursor:pointer;
           "
         >
           Search Tenders
@@ -134,9 +117,7 @@ if (app) {
 
 
 
-      <h2 style="
-        margin-top:40px;
-      ">
+      <h2 style="margin-top:40px;">
         Latest Opportunities
       </h2>
 
@@ -158,32 +139,44 @@ if (app) {
 
   </div>
 
-  `;
+  `
 
 
 
   const resultsContainer =
     document.querySelector<HTMLDivElement>(
       "#tenderResults"
-    );
+    )
 
 
   const searchInput =
     document.querySelector<HTMLInputElement>(
       "#searchInput"
-    );
+    )
 
 
   const searchButton =
     document.querySelector<HTMLButtonElement>(
       "#searchButton"
-    );
+    )
 
 
 
-  function displayTenders(results: typeof tenders) {
+  function displayTenders(results: Tender[]) {
 
-    if (!resultsContainer) return;
+    if (!resultsContainer) return
+
+
+    if (results.length === 0) {
+
+      resultsContainer.innerHTML = `
+        <p>
+          No tenders found.
+        </p>
+      `
+
+      return
+    }
 
 
     resultsContainer.innerHTML = results.map(tender => `
@@ -223,26 +216,55 @@ if (app) {
       </div>
 
 
-    `).join("");
+    `).join("")
 
   }
 
 
 
-  // Initial display
+  async function loadTenders() {
 
-  displayTenders(tenders);
+    const { data, error } = await supabase
+      .from("tenders")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      })
 
 
+    if (error) {
 
-  // Search functionality
+      console.error(
+        "Supabase error:",
+        error
+      )
+
+      if (resultsContainer) {
+        resultsContainer.innerHTML = `
+          <p>
+            Unable to load tenders.
+          </p>
+        `
+      }
+
+      return
+    }
+
+
+    tenders = data || []
+
+    displayTenders(tenders)
+
+  }
+
+
 
   searchButton?.addEventListener(
     "click",
     () => {
 
       const term =
-        searchInput?.value.toLowerCase() || "";
+        searchInput?.value.toLowerCase() || ""
 
 
       const filtered =
@@ -251,12 +273,16 @@ if (app) {
           tender.description.toLowerCase().includes(term) ||
           tender.category.toLowerCase().includes(term) ||
           tender.organisation.toLowerCase().includes(term)
-        );
+        )
 
 
-      displayTenders(filtered);
+      displayTenders(filtered)
 
     }
-  );
+  )
+
+
+
+  loadTenders()
 
 }
