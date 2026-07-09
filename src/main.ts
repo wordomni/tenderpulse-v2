@@ -1,3 +1,4 @@
+console.log("TenderPulse main.ts loaded");
 import { supabase } from "./supabase";
 
 type Tender = {
