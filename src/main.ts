@@ -1,5 +1,6 @@
-console.log("TenderPulse main.ts loaded");
+import "./style.css";
 import { supabase } from "./supabase";
+
 
 type Tender = {
   id?: number;
@@ -16,6 +17,7 @@ type Tender = {
 
 let tenders: Tender[] = [];
 
+
 const app = document.querySelector<HTMLDivElement>("#app");
 
 
@@ -23,60 +25,27 @@ if (app) {
 
   app.innerHTML = `
 
-  <div style="
-    font-family:Arial,sans-serif;
-    background:#f7f9fc;
-    min-height:100vh;
-    padding:40px;
-  ">
+    <div class="container">
 
-    <div style="
-      max-width:1100px;
-      margin:auto;
-    ">
-
-
-      <header style="
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:40px;
-      ">
+      <header class="header">
 
         <div>
-
-          <h1>
-            TenderPulse
-          </h1>
-
-          <p style="color:#666;">
+          <h1>TenderPulse</h1>
+          <p>
             AI-powered tender intelligence platform
           </p>
-
         </div>
 
 
-        <button style="
-          background:#111;
-          color:white;
-          border:none;
-          padding:12px 20px;
-          border-radius:8px;
-        ">
+        <button class="premium-button">
           Premium
         </button>
-
 
       </header>
 
 
 
-      <section style="
-        background:white;
-        padding:30px;
-        border-radius:16px;
-      ">
-
+      <section class="search-panel">
 
         <h2>
           Find government opportunities
@@ -85,30 +54,12 @@ if (app) {
 
         <input
           id="searchInput"
-          placeholder="Search tenders..."
-          style="
-            width:100%;
-            padding:15px;
-            border-radius:8px;
-            border:1px solid #ddd;
-          "
+          placeholder="Search IT, AI, construction, cyber..."
         />
 
 
-        <br><br>
-
-
-        <button
-          id="searchButton"
-          style="
-            background:#2563eb;
-            color:white;
-            padding:14px 25px;
-            border:none;
-            border-radius:8px;
-          "
-        >
-          Search
+        <button id="searchButton">
+          Search Tenders
         </button>
 
 
@@ -116,28 +67,24 @@ if (app) {
 
 
 
-      <h2 style="margin-top:40px;">
-        Latest Opportunities
-      </h2>
+      <section>
+
+        <h2 class="section-title">
+          Latest Opportunities
+        </h2>
 
 
-      <div
-        id="tenderResults"
-        style="
-          display:grid;
-          grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-          gap:20px;
-        "
-      >
+        <div id="tenderResults">
 
-      Loading tenders...
+          Loading tenders...
 
-      </div>
+        </div>
+
+
+      </section>
 
 
     </div>
-
-  </div>
 
   `;
 
@@ -162,19 +109,21 @@ if (app) {
 
 
 
-  function displayTenders(results:Tender[]) {
+  function displayTenders(results: Tender[]) {
 
 
     if (!resultsContainer) return;
 
 
+
     if (results.length === 0) {
 
-      resultsContainer.innerHTML =
-      `
-      <p>
-        No tenders found.
-      </p>
+      resultsContainer.innerHTML = `
+
+        <div class="empty-state">
+          No tenders found.
+        </div>
+
       `;
 
       return;
@@ -184,44 +133,91 @@ if (app) {
 
 
     resultsContainer.innerHTML =
-    results.map(tender => `
+
+      results.map(tender => `
 
 
-      <div style="
-        background:white;
-        padding:20px;
-        border-radius:12px;
-        box-shadow:0 3px 10px rgba(0,0,0,0.08);
-      ">
+        <article class="tender-card">
 
 
-        <h3>
-          ${tender.title}
-        </h3>
+          <div class="card-header">
 
 
-        <p>
-          ${tender.description}
-        </p>
+            <h3>
+              ${tender.title}
+            </h3>
 
 
-        <p>
-          🏢 ${tender.organisation}<br>
-          🌏 ${tender.country}<br>
-          📂 ${tender.category}<br>
-          ⏰ ${tender.deadline}
-        </p>
+            <span class="score">
+              ${tender.score}% Match
+            </span>
 
 
-        <strong>
-          AI Match Score: ${tender.score}%
-        </strong>
+          </div>
 
 
-      </div>
+
+          <p class="description">
+
+            ${tender.description}
+
+          </p>
 
 
-    `).join("");
+
+          <div class="details">
+
+
+            <div>
+              🏢 ${tender.organisation}
+            </div>
+
+
+            <div>
+              🌍 ${tender.country}
+            </div>
+
+
+            <div>
+              📂 ${tender.category}
+            </div>
+
+
+            <div>
+              ⏰ Deadline: ${tender.deadline}
+            </div>
+
+
+          </div>
+
+
+
+          ${
+            tender.source_url
+
+            ?
+
+            `
+              <a 
+                href="${tender.source_url}"
+                target="_blank"
+                class="view-button"
+              >
+                View Tender
+              </a>
+            `
+
+            :
+
+            ""
+
+          }
+
+
+        </article>
+
+
+      `).join("");
 
   }
 
@@ -232,12 +228,19 @@ if (app) {
 
 
     const { data, error } =
+
       await supabase
+
         .from("tenders")
+
         .select("*")
-        .order("created_at", {
-          ascending:false
-        });
+
+        .order(
+          "created_at",
+          {
+            ascending:false
+          }
+        );
 
 
 
@@ -257,16 +260,25 @@ if (app) {
     if (error) {
 
 
+      console.error(
+        error
+      );
+
+
       if(resultsContainer){
 
-        resultsContainer.innerHTML =
-        `
-        <p>
-          Unable to load tenders.
-        </p>
+        resultsContainer.innerHTML = `
+
+          <div class="empty-state">
+
+            Unable to load tenders.
+
+          </div>
+
         `;
 
       }
+
 
       return;
 
@@ -278,7 +290,10 @@ if (app) {
       data || [];
 
 
-    displayTenders(tenders);
+
+    displayTenders(
+      tenders
+    );
 
 
   }
@@ -288,45 +303,53 @@ if (app) {
 
   searchButton?.addEventListener(
     "click",
-    ()=>{
+    () => {
 
 
       const term =
+
         searchInput?.value
-        .toLowerCase()
-        || "";
+
+          .toLowerCase()
+
+          || "";
 
 
 
       const filtered =
-        tenders.filter(tender=>
 
-          tender.title
-          .toLowerCase()
-          .includes(term)
+        tenders.filter(
+          tender =>
 
-          ||
+            tender.title
+              .toLowerCase()
+              .includes(term)
 
-          tender.description
-          .toLowerCase()
-          .includes(term)
+            ||
 
-          ||
+            tender.description
+              .toLowerCase()
+              .includes(term)
 
-          tender.category
-          .toLowerCase()
-          .includes(term)
+            ||
 
-          ||
+            tender.category
+              .toLowerCase()
+              .includes(term)
 
-          tender.organisation
-          .toLowerCase()
-          .includes(term)
+            ||
+
+            tender.organisation
+              .toLowerCase()
+              .includes(term)
 
         );
 
 
-      displayTenders(filtered);
+
+      displayTenders(
+        filtered
+      );
 
 
     }
@@ -335,6 +358,5 @@ if (app) {
 
 
   loadTenders();
-
 
 }
