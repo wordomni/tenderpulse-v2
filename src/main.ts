@@ -128,7 +128,6 @@ if (app) {
       "#searchButton"
     );
 
-
   const countryFilter =
     document.querySelector<HTMLSelectElement>(
       "#countryFilter"
