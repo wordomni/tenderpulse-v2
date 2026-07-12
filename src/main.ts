@@ -18,65 +18,127 @@ type Tender = {
 let tenders: Tender[] = [];
 
 
-const app = document.querySelector<HTMLDivElement>("#app");
+const app =
+  document.querySelector<HTMLDivElement>("#app");
+
 
 
 if (app) {
+
 
   app.innerHTML = `
 
     <div class="container">
 
+
       <header class="header">
 
         <div>
-          <h1>TenderPulse</h1>
+
+          <h1>
+            TenderPulse
+          </h1>
+
           <p>
             AI-powered tender intelligence platform
           </p>
+
         </div>
+
 
         <button class="premium-button">
           Premium
         </button>
 
+
       </header>
 
 
+
+
       <section class="search-panel">
+
 
         <h2>
           Find government opportunities
         </h2>
 
+
+
         <input
+
           id="searchInput"
+
           placeholder="Search IT, AI, construction, cyber..."
+
         />
 
+
+
+        <div class="filters">
+
+
+          <select id="countryFilter">
+
+            <option value="">
+              All Countries
+            </option>
+
+          </select>
+
+
+
+          <select id="categoryFilter">
+
+            <option value="">
+              All Categories
+            </option>
+
+          </select>
+
+
+        </div>
+
+
+
         <button id="searchButton">
+
           Search Tenders
+
         </button>
 
+
       </section>
+
+
 
 
       <section>
 
+
         <h2 class="section-title">
+
           Latest Opportunities
+
           <span id="tenderCount"></span>
+
         </h2>
 
 
+
         <div id="tenderResults">
+
           Loading tenders...
+
         </div>
+
 
       </section>
 
 
+
     </div>
+
 
   `;
 
@@ -100,6 +162,17 @@ if (app) {
     );
 
 
+  const countryFilter =
+    document.querySelector<HTMLSelectElement>(
+      "#countryFilter"
+    );
+
+
+  const categoryFilter =
+    document.querySelector<HTMLSelectElement>(
+      "#categoryFilter"
+    );
+
 
   const tenderCount =
     document.querySelector<HTMLSpanElement>(
@@ -108,9 +181,87 @@ if (app) {
 
 
 
-  function displayTenders(results: Tender[]) {
 
-    if (!resultsContainer) return;
+
+  function populateFilters() {
+
+
+    if (!countryFilter || !categoryFilter)
+      return;
+
+
+
+    const countries =
+
+      [
+        ...new Set(
+          tenders.map(
+            tender => tender.country
+          )
+        )
+      ];
+
+
+
+    const categories =
+
+      [
+        ...new Set(
+          tenders.map(
+            tender => tender.category
+          )
+        )
+      ];
+
+
+
+    countries.forEach(country => {
+
+
+      countryFilter.innerHTML += `
+
+        <option value="${country}">
+          ${country}
+        </option>
+
+      `;
+
+
+    });
+
+
+
+
+    categories.forEach(category => {
+
+
+      categoryFilter.innerHTML += `
+
+        <option value="${category}">
+          ${category}
+        </option>
+
+      `;
+
+
+    });
+
+
+  }
+
+
+
+
+
+  function displayTenders(
+    results: Tender[]
+  ) {
+
+
+
+    if (!resultsContainer)
+      return;
+
 
 
     if (tenderCount) {
@@ -122,23 +273,33 @@ if (app) {
 
 
 
+
+
     if (results.length === 0) {
+
 
       resultsContainer.innerHTML = `
 
         <div class="empty-state">
+
           No tenders found.
+
         </div>
 
       `;
 
+
       return;
+
 
     }
 
 
 
+
+
     resultsContainer.innerHTML =
+
 
       results.map(tender => `
 
@@ -154,8 +315,11 @@ if (app) {
             </h3>
 
 
+
             <span class="score">
+
               ${tender.score}% Match
+
             </span>
 
 
@@ -163,31 +327,41 @@ if (app) {
 
 
 
+
           <p class="description">
+
             ${tender.description}
+
           </p>
+
 
 
 
           <div class="details">
 
+
             <div>
               🏢 ${tender.organisation}
             </div>
+
 
             <div>
               🌍 ${tender.country}
             </div>
 
+
             <div>
               📂 ${tender.category}
             </div>
+
 
             <div>
               ⏰ Deadline: ${tender.deadline}
             </div>
 
+
           </div>
+
 
 
 
@@ -197,13 +371,21 @@ if (app) {
             ?
 
             `
-              <a
-                href="${tender.source_url}"
-                target="_blank"
-                class="view-button"
-              >
-                View Tender
-              </a>
+
+            <a
+
+              href="${tender.source_url}"
+
+              target="_blank"
+
+              class="view-button"
+
+            >
+
+              View Tender
+
+            </a>
+
             `
 
             :
@@ -213,12 +395,136 @@ if (app) {
           }
 
 
+
+
         </article>
+
 
 
       `).join("");
 
+
+
   }
+
+
+
+
+
+
+
+  function filterTenders() {
+
+
+    const searchTerm =
+
+      searchInput?.value
+        .toLowerCase()
+        .trim()
+        || "";
+
+
+
+    const selectedCountry =
+
+      countryFilter?.value
+        || "";
+
+
+
+    const selectedCategory =
+
+      categoryFilter?.value
+        || "";
+
+
+
+
+    const filtered =
+
+
+      tenders.filter(tender => {
+
+
+
+        const matchesSearch =
+
+
+          tender.title
+            .toLowerCase()
+            .includes(searchTerm)
+
+
+          ||
+
+          tender.description
+            .toLowerCase()
+            .includes(searchTerm)
+
+
+          ||
+
+          tender.organisation
+            .toLowerCase()
+            .includes(searchTerm);
+
+
+
+
+
+        const matchesCountry =
+
+          !selectedCountry
+
+          ||
+
+          tender.country === selectedCountry;
+
+
+
+
+
+        const matchesCategory =
+
+          !selectedCategory
+
+          ||
+
+          tender.category === selectedCategory;
+
+
+
+
+
+        return (
+
+          matchesSearch
+
+          &&
+
+          matchesCountry
+
+          &&
+
+          matchesCategory
+
+        );
+
+
+      });
+
+
+
+
+    displayTenders(
+      filtered
+    );
+
+
+  }
+
+
+
 
 
 
@@ -227,61 +533,76 @@ if (app) {
   async function loadTenders() {
 
 
-    const { data, error } =
 
-      await supabase
+    const {
 
-        .from("tenders")
+      data,
 
-        .select("*")
+      error
 
-        .order(
-          "created_at",
-          {
-            ascending: false
-          }
-        );
+    } = await supabase
+
+
+      .from("tenders")
+
+
+      .select("*")
+
+
+      .order(
+
+        "created_at",
+
+        {
+
+          ascending:false
+
+        }
+
+      );
+
+
 
 
 
     console.log(
-      "Supabase returned:",
+      "Supabase:",
       data
     );
 
 
+
+
+
     if (error) {
 
+
       console.error(
-        "Supabase error:",
         error
       );
 
 
-      if (resultsContainer) {
-
-        resultsContainer.innerHTML = `
-
-          <div class="empty-state">
-            Unable to load tenders.
-          </div>
-
-        `;
-
-      }
-
       return;
 
+
     }
+
 
 
 
     tenders = data || [];
 
 
+
+    populateFilters();
+
+
+
     displayTenders(
       tenders
     );
+
+
 
   }
 
@@ -289,70 +610,39 @@ if (app) {
 
 
 
+
+
   searchButton?.addEventListener(
+
     "click",
-    () => {
 
+    filterTenders
 
-      const term =
-
-        searchInput?.value
-
-          .toLowerCase()
-
-          .trim()
-
-          || "";
+  );
 
 
 
-      const filtered =
+  countryFilter?.addEventListener(
 
-        tenders.filter(
-          tender =>
+    "change",
 
-            tender.title
-              .toLowerCase()
-              .includes(term)
+    filterTenders
 
-            ||
-
-            tender.description
-              .toLowerCase()
-              .includes(term)
-
-            ||
-
-            tender.category
-              .toLowerCase()
-              .includes(term)
-
-            ||
-
-            tender.organisation
-              .toLowerCase()
-              .includes(term)
-
-            ||
-
-            tender.country
-              .toLowerCase()
-              .includes(term)
-
-        );
+  );
 
 
 
-      displayTenders(
-        filtered
-      );
+  categoryFilter?.addEventListener(
 
+    "change",
 
-    }
+    filterTenders
+
   );
 
 
 
   loadTenders();
+
 
 }
