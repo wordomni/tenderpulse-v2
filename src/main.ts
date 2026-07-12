@@ -36,13 +36,11 @@ if (app) {
           </p>
         </div>
 
-
         <button class="premium-button">
           Premium
         </button>
 
       </header>
-
 
 
       <section class="search-panel">
@@ -51,35 +49,29 @@ if (app) {
           Find government opportunities
         </h2>
 
-
         <input
           id="searchInput"
           placeholder="Search IT, AI, construction, cyber..."
         />
 
-
         <button id="searchButton">
           Search Tenders
         </button>
 
-
       </section>
-
 
 
       <section>
 
         <h2 class="section-title">
           Latest Opportunities
+          <span id="tenderCount"></span>
         </h2>
 
 
         <div id="tenderResults">
-
           Loading tenders...
-
         </div>
-
 
       </section>
 
@@ -109,10 +101,24 @@ if (app) {
 
 
 
+  const tenderCount =
+    document.querySelector<HTMLSpanElement>(
+      "#tenderCount"
+    );
+
+
+
   function displayTenders(results: Tender[]) {
 
-
     if (!resultsContainer) return;
+
+
+    if (tenderCount) {
+
+      tenderCount.textContent =
+        ` (${results.length} tenders)`;
+
+    }
 
 
 
@@ -158,35 +164,28 @@ if (app) {
 
 
           <p class="description">
-
             ${tender.description}
-
           </p>
 
 
 
           <div class="details">
 
-
             <div>
               🏢 ${tender.organisation}
             </div>
-
 
             <div>
               🌍 ${tender.country}
             </div>
 
-
             <div>
               📂 ${tender.category}
             </div>
 
-
             <div>
               ⏰ Deadline: ${tender.deadline}
             </div>
-
 
           </div>
 
@@ -198,7 +197,7 @@ if (app) {
             ?
 
             `
-              <a 
+              <a
                 href="${tender.source_url}"
                 target="_blank"
                 class="view-button"
@@ -224,6 +223,7 @@ if (app) {
 
 
 
+
   async function loadTenders() {
 
 
@@ -238,7 +238,7 @@ if (app) {
         .order(
           "created_at",
           {
-            ascending:false
+            ascending: false
           }
         );
 
@@ -250,35 +250,25 @@ if (app) {
     );
 
 
-    console.log(
-      "Supabase error:",
-      error
-    );
-
-
-
     if (error) {
 
-
       console.error(
+        "Supabase error:",
         error
       );
 
 
-      if(resultsContainer){
+      if (resultsContainer) {
 
         resultsContainer.innerHTML = `
 
           <div class="empty-state">
-
             Unable to load tenders.
-
           </div>
 
         `;
 
       }
-
 
       return;
 
@@ -286,17 +276,15 @@ if (app) {
 
 
 
-    tenders =
-      data || [];
-
+    tenders = data || [];
 
 
     displayTenders(
       tenders
     );
 
-
   }
+
 
 
 
@@ -311,6 +299,8 @@ if (app) {
         searchInput?.value
 
           .toLowerCase()
+
+          .trim()
 
           || "";
 
@@ -340,6 +330,12 @@ if (app) {
             ||
 
             tender.organisation
+              .toLowerCase()
+              .includes(term)
+
+            ||
+
+            tender.country
               .toLowerCase()
               .includes(term)
 
